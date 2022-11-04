@@ -26,5 +26,14 @@ with open("sample-data.json","r") as file:
             status = virtual_machine_cfg["status"]
             print(f"status: {status}")
 
+            #adresses
+            networks = virtual_machine_cfg["state"]["network"]
+            
+            for network in networks:
+                addresses = virtual_machine_cfg["state"]["network"][network]["addresses"]
+
+                for address in addresses:
+                    print(f"address: {address['address']}")
+
         except TypeError:
             print("data not found")

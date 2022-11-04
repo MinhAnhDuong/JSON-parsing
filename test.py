@@ -1,48 +1,65 @@
 import json
 
-with open("sample-data.json","r") as file:
-    list_data = json.load(file)
 
-    for virtual_machine_cfg in list_data:
-        try:
-            print("------------------------------------")
+class MyFilter:
+    def __init__(self, path_to_file):
+        self.path_to_file = path_to_file
+        self.list_of_vms = list()
+        self.vm = {
+            "name": str(),
+            "memory_usage": int(),
+            "status": str(),
+            "date": str(),
+            "cpu": int(),
+            "address": list(),
+        }
 
-            name = virtual_machine_cfg["name"]
-            print(f"name: {name}")
-        except (KeyError, TypeError):
-            print("name: value not found")
+    def filter(self):
+        with open(self.path_to_file, "r") as file:
+            list_data = json.load(file)
 
-        try:
-            cpu = virtual_machine_cfg["state"]["cpu"]["usage"]
-            print(f"CPU: {cpu}")
-        except (KeyError, TypeError):
-            print("CPU: value not found")
+            for virtual_machine_cfg in list_data:
+                try:
+                    name = virtual_machine_cfg["name"]
+                    self.vm["name"] = name
+                except (KeyError, TypeError):
+                    self.vm["name"] = "value not found"
 
-        try:
-            memory_usage = virtual_machine_cfg["state"]["memory"]["usage"]
-            print(f"memory usage: {memory_usage}")
-        except (KeyError, TypeError):
-            print("memory usage: value not found")
+                try:
+                    cpu = virtual_machine_cfg["state"]["cpu"]["usage"]
+                    self.vm["cpu"] = cpu
+                except (KeyError, TypeError):
+                    self.vm["cpu"] = "value not found"
 
-        try:
-            date_of_create = virtual_machine_cfg["created_at"]
-            print(f"date: {date_of_create}")
-        except (KeyError, TypeError):
-            print("date: value not found")
+                try:
+                    memory_usage = virtual_machine_cfg["state"]["memory"]["usage"]
+                    self.vm["memory_usage"] = memory_usage
+                except (KeyError, TypeError):
+                    self.vm["memory_usage"] = "value not found"
 
-        try:
-            status = virtual_machine_cfg["status"]
-            print(f"status: {status}")
-        except (KeyError, TypeError):
-            print("status: value not found")
+                try:
+                    date_of_create = virtual_machine_cfg["created_at"]
+                    self.vm["date"] = date_of_create
+                except (KeyError, TypeError):
+                    self.vm["date"] = "value not found"
 
-        try:
-            networks = virtual_machine_cfg["state"]["network"]
+                try:
+                    status = virtual_machine_cfg["status"]
+                    self.vm["status"] = status
+                except (KeyError, TypeError):
+                    self.vm["status"] = "value not found"
 
-            for network in networks:
-                addresses = virtual_machine_cfg["state"]["network"][network]["addresses"]
+                try:
+                    networks = virtual_machine_cfg["state"]["network"]
 
-                for address in addresses:
-                    print(f"address: {address['address']}")
-        except (KeyError, TypeError):
-            print("address: value not found")
+                    for network in networks:
+                        addresses = virtual_machine_cfg["state"]["network"][network]["addresses"]
+
+                        for address in addresses:
+                            self.vm["address"] = address["address"]
+                except (KeyError, TypeError):
+                    self.vm["address"] = "value not found"  
+
+test_filter = MyFilter("sample-data.json")
+filtered = test_filter.filter()
+print(test_filter.vm)

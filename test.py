@@ -1,5 +1,11 @@
 import json
+from datetime import datetime, timezone
 
+def convert_time(json_date):
+    date = json_date
+    date_stript = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S%z')
+    timestamp = date_stript.replace(tzinfo=timezone.utc).timestamp()
+    return timestamp
 
 class MyFilter:
     def __init__(self, path_to_file):
@@ -45,7 +51,8 @@ class MyFilter:
 
                 try:
                     date_of_create = virtual_machine_cfg["created_at"]
-                    self.date = date_of_create
+                    utc_date = convert_time(date_of_create)
+                    self.date = utc_date
                 except (KeyError, TypeError):
                     self.date = "value not found"
 

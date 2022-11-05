@@ -2,19 +2,13 @@ import json
 from datetime import datetime, timezone
 import csv
 
+
 def convert_time(json_date):
     date = json_date
     date_stript = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S%z')
     timestamp = date_stript.replace(tzinfo=timezone.utc).timestamp()
     return timestamp
 
-def data_writer(file_name, add_new_content):
-        with open(file_name, mode="a") as csv_file:
-            fieldnames = ["name", "memory_usage", "status", "date", "cpu", "ip_address"]
-            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-            writer.writeheader()
-            csv_writer = csv.writer(csv_file)
-            csv_writer.writerow(add_new_content)
 
 class MyFilter:
     def __init__(self, path_to_file):
@@ -85,11 +79,19 @@ class MyFilter:
                     self.address = "value not found"
 
                 self.vm = (self.name, self.memory_usage, self.status, self.date, self.cpu, self.address)  
-                data_writer("filtered_data.csv", self.vm) 
-
-                self.list_of_vms.append(self.vm)
-                
+                self.list_of_vms.append(self.vm)           
         return self.list_of_vms
 
 test_filter = MyFilter("sample-data.json")
-filtered = test_filter.filter()
+filtered_data = test_filter.filter()
+
+def data_writer(file_name, one_filter):
+    with open(file_name, mode="a") as csv_file:
+        fieldnames = ["name", "memory_usage", "status", "date", "cpu", "ip_address"]
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer.writeheader()
+        for one_filter in filtered_data:
+            csv_writer = csv.writer(csv_file)
+            csv_writer.writerow(one_filter)
+
+data_writer("filtered_data.csv", filtered_data)

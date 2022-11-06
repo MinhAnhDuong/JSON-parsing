@@ -1,4 +1,6 @@
 import json
+import psycopg2
+
 
 from datetime import datetime, timezone
 
@@ -8,6 +10,19 @@ def convert_time(json_date):
     date_stript = datetime.strptime(date, '%Y-%m-%dT%H:%M:%S%z')
     timestamp = date_stript.replace(tzinfo=timezone.utc).timestamp()
     return timestamp
+
+
+def psql_connector(db="postgres", user="postgres", passwd="12345678", server="127.0.0.5", port="5432"):
+    print("Creating connection to database")
+    try:
+        conn = psycopg2.connect(database=db, user=user, password=passwd, host=server, port=port)
+
+    except Exception:
+        print("ERROR: database connecting")
+
+    cur = conn.cursor()
+
+    return conn, cur
 
 
 class MyFilter:

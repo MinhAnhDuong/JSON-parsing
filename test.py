@@ -1,5 +1,6 @@
 import json
 import psycopg2
+import time
 
 
 from datetime import datetime, timezone
@@ -13,16 +14,22 @@ def convert_time(json_date):
 
 
 def psql_connector(db="postgres", user="postgres", passwd="12345678", server="127.0.0.5", port="5432"):
+    error = False
     print("Creating connection to database")
     try:
         conn = psycopg2.connect(database=db, user=user, password=passwd, host=server, port=port)
 
-    except Exception:
+    except Exception as e:
         print("ERROR: database connecting")
+        print(e)
+        error = True
+        conn_2 = ""
+        cur_2 = ""
+        return error, conn_2, cur_2
 
     cur = conn.cursor()
 
-    return conn, cur
+    return error, conn, cur
 
 
 def init_table(conn, cur):
@@ -126,14 +133,20 @@ def main():
     test_filter = MyFilter("sample-data.json")
     filtered_data = test_filter.filter()
 
-    conn, cur = psql_connector(server="127.0.0.1")
+    error, connection, cursor = psql_connector(server="mydb")
+    if error:
+        time.sleep(15)
+        error, connection, cursor = psql_connector(server="mydb")
+        if error:
+            print("DB connection failed")
+            exit()
 
-    init_table(conn, cur)
+    init_table(connection, cursor)
 
     for row in filtered_data:
-        write_to_database(conn, cur, row)
+        write_to_database(connection, cursor, row)
 
-    conn.close()
+    connection.close()
 
 
 if __name__ == '__main__':

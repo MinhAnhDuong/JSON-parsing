@@ -25,6 +25,16 @@ def psql_connector(db="postgres", user="postgres", passwd="12345678", server="12
     return conn, cur
 
 
+def init_table(conn, cur):
+    print("Initializing database table")
+    try:
+        cur.execute("CREATE TABLE my_filter(name varchar NOT NULL, cpu varchar, memory_usage varchar, utc_date varchar, status varchar, ip_address varchar);")
+        conn.commit()
+    except Exception:
+        print("WARNING: table already exists.")
+        conn.rollback()
+
+
 class MyFilter:
     def __init__(self, path_to_file):
         self.path_to_file = path_to_file

@@ -5,7 +5,7 @@ try:
     conn = psycopg2.connect(database="postgres", user="postgres", password="12345678", host="127.0.0.1", port="5432")
 
 except Exception:
-    print("database connecting ERROR") 
+    print("database connecting ERROR")
 
 cur = conn.cursor()
 
@@ -18,8 +18,7 @@ with open('filtered_data.csv', 'r') as f:
     reader = csv.reader(f)
     next(reader)
     for row in reader:
-        cur.execute(
-        "INSERT INTO my_filter VALUES (%s, %s, %s, %s, %s, %s)",
-        row
-    )
+        cur.execute("INSERT INTO my_filter VALUES (%s, %s, %s, %s, %s, %s)", row)
+
+
 conn.commit()

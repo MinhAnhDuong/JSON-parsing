@@ -35,6 +35,19 @@ def init_table(conn, cur):
         conn.rollback()
 
 
+def write_to_database(conn, cur, data):
+    try:
+        print("Creating query")
+        cur.execute("INSERT INTO my_filter VALUES (%s, %s, %s, %s, %s, %s)", data)
+    except Exception as e:
+        print("Some error, rolling back")
+        print(e)
+        conn.rollback()
+
+    print("Committing transaction")
+    conn.commit()
+
+
 class MyFilter:
     def __init__(self, path_to_file):
         self.path_to_file = path_to_file
@@ -109,5 +122,19 @@ class MyFilter:
         return self.list_of_vms
 
 
-test_filter = MyFilter("sample-data.json")
-filtered_data = test_filter.filter()
+def main():
+    test_filter = MyFilter("sample-data.json")
+    filtered_data = test_filter.filter()
+
+    conn, cur = psql_connector(server="127.0.0.1")
+
+    init_table(conn, cur)
+
+    for row in filtered_data:
+        write_to_database(conn, cur, row)
+
+    conn.close()
+
+
+if __name__ == '__main__':
+    main()
